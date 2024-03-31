@@ -25,24 +25,22 @@ public class SecurityConfig extends AbstractSecurityWebApplicationInitializer {
         http
                 .authorizeHttpRequests((authorize) ->
                         authorize
-                                .requestMatchers("/actuator/health").permitAll()
+                                .requestMatchers("/actuator/health", "/login", "/logout").permitAll()
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/user/**").hasAnyRole("ADMIN", "USER")
+                                .anyRequest().denyAll()
                 )
                 .exceptionHandling((ex)->ex.accessDeniedHandler(defaultAccessDeniedHandler))
                 .formLogin(login-> login
                         .loginPage("/login")
-                        .defaultSuccessUrl("/user/hello")
-                        .permitAll())
+                        .defaultSuccessUrl("/user/hello"))
                 .logout((logout) -> logout
                         .logoutUrl("/logout")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
-                        .logoutSuccessUrl("/login")
-                        .permitAll());
+                        .logoutSuccessUrl("/login"));
         return http.build();
     }
-
 
     @Bean
     public UserDetailsService userDetailsService() {
